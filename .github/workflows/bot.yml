@@ -16,14 +16,14 @@ jobs:
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      
-- name: Instalar bibliotecas
-  run: pip install python-telegram-bot
+      - name: Instalar biblioteca
+        run: pip install python-telegram-bot
 
-  
       - name: Iniciar bot
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        run: python bot.py.
+        run: python bot.py
+
+
