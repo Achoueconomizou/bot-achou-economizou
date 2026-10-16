@@ -18,9 +18,11 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Instalar bibliotecas
-        run: pip install -r requirements.txt
+      
+- name: Instalar bibliotecas
+  run: pip install python-telegram-bot
 
+  
       - name: Iniciar bot
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
