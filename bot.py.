@@ -1,70 +1,30 @@
 
-import os
-from telegram import Update
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    MessageHandler,
-    ContextTypes,
-    filters,
-)
+name: Bot Achou Economizou
 
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+on:
+  workflow_dispatch:
 
+jobs:
+  iniciar-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
 
-async def iniciar(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "🛍️ Achou, Economizou!\n\n"
-        "Envie um link de produto da Shopee "
-        "ou do Mercado Livre para criar sua propaganda."
-    )
+    steps:
+      - name: Baixar arquivos
+        uses: actions/checkout@v4
 
+      - name: Conferir arquivos
+        run: ls -la
 
-async def receber_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    link = update.message.text.strip()
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-    if not link.startswith(("https://", "http://")):
-        await update.message.reply_text(
-            "Envie um link válido do produto, por favor."
-        )
-        return
+      - name: Instalar biblioteca
+        run: python -m pip install python-telegram-bot
 
-    if "shopee" in link.lower():
-        loja = "SHOPEE"
-    elif "mercadolivre" in link.lower() or "meli.la" in link.lower():
-        loja = "MERCADO LIVRE"
-    else:
-        await update.message.reply_text(
-            "Envie um link da Shopee ou do Mercado Livre."
-        )
-        return
-
-    propaganda = (
-        f"🛍️ {loja}\n\n"
-        "🔥 OLHA ESSE ACHADO!\n\n"
-        "📦 Produto: EDITAR\n\n"
-        "🏷️ De: R$ EDITAR\n"
-        "💥 Por: R$ EDITAR\n"
-        "🔥 Desconto: EDITAR\n\n"
-        f"🛒 Compre aqui 👉 {link}\n\n"
-        "⚠️ Preço e disponibilidade podem mudar.\n"
-        "💗 Achou, Economizou!"
-    )
-
-    await update.message.reply_text(propaganda)
-
-
-def main():
-    if not TOKEN:
-        raise RuntimeError("Configure o token do bot antes de iniciar.")
-
-    app = Application.builder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", iniciar))
-    app.add_handler(
-        MessageHandler(filters.TEXT & ~filters.COMMAND, receber_link)
-    )
-    app.run_polling()
-
-
-if __name__ == "__main__":
-    main()
+      - name: Iniciar bot
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python bot.py
